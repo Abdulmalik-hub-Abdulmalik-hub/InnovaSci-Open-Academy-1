@@ -61,7 +61,7 @@ export function CourseCatalog({ initialCourses = [] }: CourseCatalogProps) {
     }
   }, [initialCourses.length]);
 
-  const categories = [...new Set(courses.map((c) => c.category).filter(Boolean))];
+  const categories = Array.from(new Set(courses.map((c) => c.category).filter(Boolean)));
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

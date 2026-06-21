@@ -9,8 +9,8 @@ import {
   Brain,
   Database,
   Code2,
-  ChartLine,
   Microscope,
+  TrendingUp,
 } from "lucide-react";
 
 const categories = [
@@ -59,7 +59,7 @@ const categories = [
   {
     name: "Research Methods",
     slug: "research-methods",
-    icon: ChartLine,
+    icon: TrendingUp,
     count: 12,
     color: "from-orange-500 to-amber-500",
   },

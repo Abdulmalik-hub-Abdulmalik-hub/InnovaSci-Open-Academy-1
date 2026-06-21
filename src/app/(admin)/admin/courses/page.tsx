@@ -130,7 +130,7 @@ export default function AdminCoursesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<typeof mockCourses[0] | null>(null);
 
-  const categories = [...new Set(courses.map((c) => c.category))];
+  const categories = Array.from(new Set(courses.map((c) => c.category)));
 
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
