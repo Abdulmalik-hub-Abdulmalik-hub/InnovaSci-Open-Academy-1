@@ -40,6 +40,48 @@ INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'SUPER_ADMIN'
 ON CONFLICT DO NOTHING;
 
+-- ============================================
+-- ADMIN USER CREATION
+-- ============================================
+-- This creates the admin user for InnovaSci Open Academy
+-- Email: innovasciailabspolytechnic@gmail.com
+-- Password: Ummuhani////1
+
+-- First, create the user in auth.users (Supabase Auth)
+-- Note: In Supabase, users are created via the Auth system, not directly in the database
+-- Run this SQL after creating the user via Supabase Dashboard or API:
+
+-- 1. Create the profile for the admin user
+-- Replace 'USER_ID_FROM_AUTH' with the actual user ID from auth.users
+-- The profile will be created automatically if using Supabase triggers,
+-- but you can also insert manually:
+
+INSERT INTO profiles (user_id, full_name, email, role, status)
+VALUES (
+  (SELECT id FROM auth.users WHERE email = 'innovasciailabspolytechnic@gmail.com'),
+  'InnovaSci Admin',
+  'innovasciailabspolytechnic@gmail.com',
+  'SUPER_ADMIN',
+  'ACTIVE'
+)
+ON CONFLICT (user_id) DO UPDATE SET
+  full_name = 'InnovaSci Admin',
+  role = 'SUPER_ADMIN',
+  status = 'ACTIVE';
+
+-- Assign SUPER_ADMIN role to the user
+INSERT INTO user_roles (user_id, role_id)
+SELECT 
+  (SELECT id FROM auth.users WHERE email = 'innovasciailabspolytechnic@gmail.com'),
+  r.id
+FROM roles r
+WHERE r.name = 'SUPER_ADMIN'
+ON CONFLICT (user_id, role_id) DO NOTHING;
+
+-- ============================================
+-- END ADMIN USER CREATION
+-- ============================================
+
 -- Insert sample courses
 INSERT INTO courses (title, slug, code, category, subcategory, short_description, full_description, learning_outcomes, difficulty_level, duration_hours, price, is_free, status, featured) VALUES
   ('Introduction to Computational Chemistry', 'intro-computational-chemistry', 'ISA-CHEM001', 'Computational Chemistry', 'Molecular Modeling',

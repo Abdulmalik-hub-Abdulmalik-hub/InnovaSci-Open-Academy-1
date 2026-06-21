@@ -50,8 +50,10 @@ A world-class, enterprise-grade Learning Management System (LMS) platform for sc
 - **Prisma** - Type-safe ORM
 - **PostgreSQL** - Relational database
 
-### Integrations
-- **Stripe** - Payment processing
+### Payment Integrations
+- **Paystack** - Nigerian Naira (NGN) payments
+- **Flutterwave** - African payment gateway
+- **Stripe** - International payments
 - **Resend** - Email delivery
 - **Vercel** - Deployment
 
@@ -123,6 +125,53 @@ npm run dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🔐 Admin User Setup
+
+### Credentials
+- **Email:** innovasciailabspolytechnic@gmail.com
+- **Password:** Ummuhani////1
+
+### Setup Steps
+1. Go to Supabase Dashboard > Authentication > Users
+2. Click "Add User"
+3. Enter the email and password above
+4. Click "Create User"
+5. Copy the user's UUID
+6. Run `prisma/seed.sql` or `prisma/setup-admin.sql` in Supabase SQL Editor
+7. The admin will now have access to the admin dashboard
+
+## 💳 Payment Configuration
+
+### Paystack (NGN - Nigerian Naira)
+1. Create account at [paystack.com](https://paystack.com)
+2. Get your API keys from Dashboard > Settings > API Keys
+3. Add to `.env.local`:
+```
+PAYSTACK_SECRET_KEY=sk_live_xxx
+PAYSTACK_PUBLIC_KEY=pk_live_xxx
+PAYSTACK_WEBHOOK_SECRET=whsec_xxx
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_live_xxx
+```
+
+### Stripe (USD - International)
+1. Create account at [stripe.com](https://stripe.com)
+2. Get your API keys from Dashboard
+3. Add to `.env.local`:
+```
+STRIPE_SECRET_KEY=sk_live_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+```
+
+### Flutterwave (African Currencies)
+1. Create account at [flutterwave.com](https://flutterwave.com)
+2. Get your API keys from Dashboard
+3. Add to `.env.local`:
+```
+FLUTTERWAVE_PUBLIC_KEY=FLWPUBK-xxx
+FLUTTERWAVE_SECRET_KEY=FLWSECK-xxx
+FLUTTERWAVE_WEBHOOK_SECRET=FLWHSECK-xxx
+```
 
 ## 🔐 Database Schema
 
