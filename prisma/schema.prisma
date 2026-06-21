@@ -1,757 +1,430 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-// ============================================
-// AUTH & USERS
-// ============================================
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  passwordHash  String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  profile        Profile?
-  accounts       Account[]
-  sessions       Session[]
-  enrollments    Enrollment[]
-  certificates   Certificate[]
-  payments       Payment[]
-  wishlists      Wishlist[]
-  notifications  Notification[]
-  progress       LearningProgress[]
-  auditLogs      AuditLog[]
-  newsletterSubs NewsletterSubscriber?
-
-  @@map("users")
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-// ============================================
-// PROFILES & ROLES
-// ============================================
-
-model Profile {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  fullName     String?
-  username     String?  @unique
-  phone        String?
-  country      String?
-  state        String?
-  city         String?
-  gender       String?
-  bio          String?
-  avatarUrl    String?
-  academicInterests String?
-  socialLinks  Json?
-  role         UserRole @default(STUDENT)
-  status       AccountStatus @default(ACTIVE)
-  lastLoginAt  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courses           Course[]          @relation("InstructorCourses")
-  enrollments       Enrollment[]
-  certificates      Certificate[]
-  payments          Payment[]
-  wishlists         Wishlist[]
-  notifications     Notification[]
-  progress          LearningProgress[]
-  userRoles         UserRoleAssignment[]
-  storageFiles      StorageFile[]
-  newsletterSubs    NewsletterSubscriber?
-
-  @@map("profiles")
-}
-
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  INSTRUCTOR
-  COURSE_MANAGER
-  STUDENT
-  GUEST
-}
-
-enum AccountStatus {
-  ACTIVE
-  SUSPENDED
-  PENDING
-  DEACTIVATED
-}
-
-model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  permissions Permission[]
-  userRoles   UserRoleAssignment[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("roles")
-}
-
-model Permission {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  description String?
-  category    String?
-  roles       Role[]
-  userRoles   UserRoleAssignment[]
-  createdAt   DateTime @default(now())
-
-  @@map("permissions")
-}
-
-model UserRoleAssignment {
-  id           String   @id @default(cuid())
-  userId       String
-  roleId       String
-  assignedBy   String?
-  expiresAt    DateTime?
-  createdAt    DateTime @default(now())
-
-  user       Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission Permission[]
-
-  @@unique([userId, roleId])
-  @@map("user_role_assignments")
-}
-
-// ============================================
-// COURSES
-// ============================================
-
-model Course {
-  id               String          @id @default(cuid())
-  title            String
-  slug             String          @unique
-  code             String          @unique
-  category         String?
-  subcategory      String?
-  shortDescription String?
-  fullDescription  String?         @db.Text
-  learningOutcomes String?         @db.Text
-  prerequisites    String?         @db.Text
-  targetAudience   String?         @db.Text
-  difficultyLevel  DifficultyLevel @default(BEGINNER)
-  language         String          @default("English")
-  durationHours    Int?
-  thumbnailUrl     String?
-  promoVideoUrl    String?
-  price            Decimal         @default(0) @db.Decimal(10, 2)
-  currency         String          @default("USD")
-  isFree           Boolean         @default(true)
-  status           CourseStatus    @default(DRAFT)
-  featured         Boolean         @default(false)
-  instructorId     String?
-  metaTitle        String?
-  metaDescription  String?
-  tags             String[]
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  publishedAt      DateTime?
-
-  instructor  Profile?        @relation("InstructorCourses", fields: [instructorId], references: [id])
-  lessons     Lesson[]
-  enrollments Enrollment[]
-  certificates Certificate[]
-  payments    Payment[]
-  wishlists   Wishlist[]
-  learningPathsCourse LearningPathCourse[]
-
-  @@index([status])
-  @@index([category])
-  @@index([instructorId])
-  @@map("courses")
-}
-
-enum DifficultyLevel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-  EXPERT
-}
-
-enum CourseStatus {
-  DRAFT
-  REVIEW
-  PUBLISHED
-  ARCHIVED
-  SUSPENDED
-}
-
-model Lesson {
-  id          String   @id @default(cuid())
-  courseId    String
-  title       String
-  description String?  @db.Text
-  orderIndex  Int      @default(0)
-  duration    Int?     // in minutes
-  isPreview   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  course     Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  videos     Video[]
-  materials  Material[]
-  progress   LearningProgress[]
-
-  @@index([courseId])
-  @@map("lessons")
-}
-
-model Video {
-  id           String       @id @default(cuid())
-  lessonId     String
-  title        String
-  description  String?      @db.Text
-  videoUrl     String
-  duration     Int?         // in seconds
-  thumbnailUrl String?
-  provider     VideoProvider @default(SUPABASE)
-  storageType  StorageType  @default(URL)
-  quality      String?      // e.g., "1080p", "720p"
-  orderIndex   Int          @default(0)
-  isPublic     Boolean      @default(true)
-  views        Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@index([lessonId])
-  @@map("videos")
-}
-
-enum VideoProvider {
-  SUPABASE
-  AWS_S3
-  CLOUDFLARE_R2
-  CLOUDFLARE_STREAM
-  BUNNY_STREAM
-  VIMEO
-  YOUTUBE
-  GOOGLE_DRIVE
-  CUSTOM
-}
-
-enum StorageType {
-  URL
-  FILE
-  STREAM
-}
-
-model Material {
-  id              String        @id @default(cuid())
-  lessonId        String
-  title           String
-  description     String?       @db.Text
-  type            MaterialType
-  fileUrl         String
-  fileSize        Int?          // in bytes
-  mimeType        String?
-  visibility      Visibility    @default(PUBLIC)
-  downloadAllowed Boolean       @default(true)
-  orderIndex      Int           @default(0)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@index([lessonId])
-  @@map("materials")
-}
-
-enum MaterialType {
-  PDF
-  SLIDES
-  NOTE
-  ASSIGNMENT
-  ARTICLE
-  EBOOK
-  DATASET
-  CODE
-  EXTERNAL
-}
-
-enum Visibility {
-  PUBLIC
-  ENROLLED
-  PREMIUM
-}
-
-// ============================================
-// LEARNING PATHS
-// ============================================
-
-model LearningPath {
-  id           String   @id @default(cuid())
-  title        String
-  slug         String   @unique
-  description  String?  @db.Text
-  thumbnailUrl String?
-  difficulty   DifficultyLevel @default(BEGINNER)
-  estimatedHours Int?
-  status       CourseStatus @default(DRAFT)
-  featured     Boolean  @default(false)
-  orderIndex   Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  courses LearningPathCourse[]
-  enrollments LearningPathEnrollment[]
-
-  @@map("learning_paths")
-}
-
-model LearningPathCourse {
-  id              String   @id @default(cuid())
-  learningPathId  String
-  courseId        String
-  orderIndex      Int      @default(0)
-  isRequired      Boolean  @default(true)
-
-  learningPath LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
-  course       Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([learningPathId, courseId])
-  @@map("learning_path_courses")
-}
-
-// ============================================
-// ENROLLMENTS & PROGRESS
-// ============================================
-
-model Enrollment {
-  id              String   @id @default(cuid())
-  userId          String
-  courseId        String
-  progressPercent Int      @default(0)
-  completed       Boolean  @default(false)
-  completedAt     DateTime?
-  enrolledAt      DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@index([userId])
-  @@index([courseId])
-  @@map("enrollments")
-}
-
-model LearningPathEnrollment {
-  id              String   @id @default(cuid())
-  userId          String
-  learningPathId  String
-  progressPercent Int      @default(0)
-  completed       Boolean  @default(false)
-  completedAt     DateTime?
-  enrolledAt      DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  learningPath LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, learningPathId])
-  @@map("learning_path_enrollments")
-}
-
-model LearningProgress {
-  id           String   @id @default(cuid())
-  userId       String
-  courseId     String
-  lessonId     String
-  completed    Boolean  @default(false)
-  watchTime    Int      @default(0) // in seconds
-  lastPosition Int      @default(0) // video position in seconds
-  completedAt  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lesson Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId, lessonId])
-  @@index([userId])
-  @@index([courseId])
-  @@map("learning_progress")
-}
-
-// ============================================
-// CERTIFICATES
-// ============================================
-
-model Certificate {
-  id               String   @id @default(cuid())
-  userId           String
-  courseId         String
-  certificateUrl   String?
-  templateUrl      String?
-  signatureUrl     String?
-  sealUrl          String?
-  verificationCode String   @unique
-  grade            String?
-  issuedAt         DateTime @default(now())
-  expiresAt        DateTime?
-  status           CertificateStatus @default(ACTIVE)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@index([userId])
-  @@index([courseId])
-  @@map("certificates")
-}
-
-enum CertificateStatus {
-  ACTIVE
-  REVOKED
-  EXPIRED
-}
-
-model CertificateTemplate {
-  id           String   @id @default(cuid())
-  name         String
-  description  String?
-  templateUrl  String
-  signatureUrl String?
-  sealUrl      String?
-  isDefault    Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("certificate_templates")
-}
-
-// ============================================
-// PAYMENTS & SUBSCRIPTIONS
-// ============================================
-
-model Subscription {
-  id           String            @id @default(cuid())
-  userId       String
-  planName     String
-  planInterval String            @default("month") // month, year
-  price        Decimal           @db.Decimal(10, 2)
-  currency     String            @default("USD")
-  status       SubscriptionStatus @default(ACTIVE)
-  provider     PaymentProvider   @default(STRIPE)
-  providerId   String?           @unique
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-  cancelAtPeriodEnd  Boolean      @default(false)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("subscriptions")
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  UNPAID
-  INCOMPLETE
-}
-
-enum PaymentProvider {
-  STRIPE
-  PAYSTACK
-  FLUTTERWAVE
-  PAYPAL
-}
-
-model Payment {
-  id           String         @id @default(cuid())
-  userId       String
-  courseId     String?
-  amount       Decimal        @db.Decimal(10, 2)
-  currency     String         @default("USD")
-  status       PaymentStatus  @default(PENDING)
-  provider     PaymentProvider @default(STRIPE)
-  reference    String?        @unique
-  providerRef  String?
-  description  String?
-  metadata     Json?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course? @relation(fields: [courseId], references: [id])
-
-  @@index([userId])
-  @@index([courseId])
-  @@map("payments")
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  DISPUTED
-}
-
-// ============================================
-// NEWSLETTER
-// ============================================
-
-model Newsletter {
-  id          String           @id @default(cuid())
-  title       String
-  subject     String
-  content     String           @db.Text
-  status      NewsletterStatus @default(DRAFT)
-  scheduledAt DateTime?
-  sentAt      DateTime?
-  audience    NewsletterAudience @default(ALL_USERS)
-  metadata    Json?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  logs NewsletterLog[]
-
-  @@map("newsletters")
-}
-
-enum NewsletterStatus {
-  DRAFT
-  SCHEDULED
-  SENDING
-  SENT
-  FAILED
-}
-
-enum NewsletterAudience {
-  ALL_USERS
-  STUDENTS
-  INSTRUCTORS
-  PREMIUM_MEMBERS
-  INACTIVE_USERS
-  SPECIFIC_COURSES
-}
-
-model NewsletterSubscriber {
-  id          String   @id @default(cuid())
-  userId      String?  @unique
-  email       String   @unique
-  subscribed  Boolean  @default(true)
-  preferences Json?
-  subscribedAt DateTime @default(now())
-  unsubscribedAt DateTime?
-
-  user Profile? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("newsletter_subscribers")
-}
-
-model NewsletterLog {
-  id           String   @id @default(cuid())
-  newsletterId String
-  subscriberId String?
-  email        String
-  opened       Boolean  @default(false)
-  clicked      Boolean  @default(false)
-  bounced      Boolean  @default(false)
-  unsubscribed Boolean  @default(false)
-  openedAt     DateTime?
-  clickedAt    DateTime?
-  createdAt    DateTime @default(now())
-
-  newsletter Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
-
-  @@index([newsletterId])
-  @@map("newsletter_logs")
-}
-
-// ============================================
-// NOTIFICATIONS
-// ============================================
-
-model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  title     String
-  message   String           @db.Text
-  type      NotificationType
-  link      String?
-  isRead    Boolean          @default(false)
-  metadata  Json?
-  createdAt DateTime         @default(now())
-
-  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([userId, isRead])
-  @@map("notifications")
-}
-
-enum NotificationType {
-  SYSTEM
-  ENROLLMENT
-  COURSE_UPDATE
-  CERTIFICATE
-  PAYMENT
-  NEWSLETTER
-  ANNOUNCEMENT
-  REMINDER
-}
-
-// ============================================
-// STORAGE
-// ============================================
-
-model StorageFile {
-  id          String   @id @default(cuid())
-  bucket      String
-  fileName    String
-  fileUrl     String
-  fileType    String?
-  mimeType    String?
-  size        BigInt
-  uploadedBy  String
-  metadata    Json?
-  createdAt   DateTime @default(now())
-
-  uploader Profile @relation(fields: [uploadedBy], references: [id])
-
-  @@index([bucket])
-  @@index([uploadedBy])
-  @@map("storage_files")
-}
-
-// ============================================
-// ANALYTICS
-// ============================================
-
-model AnalyticsEvent {
-  id        String   @id @default(cuid())
-  userId    String?
-  eventType String
-  eventName String
-  metadata  Json?
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-  @@index([eventType])
-  @@index([createdAt])
-  @@map("analytics_events")
-}
-
-// ============================================
-// AUDIT LOGS
-// ============================================
-
-model AuditLog {
-  id           String   @id @default(cuid())
-  userId       String?
-  action       String
-  module       String
-  resourceType String?
-  resourceId   String?
-  ipAddress    String?
-  userAgent    String?
-  status       String?
-  metadata     Json?
-  createdAt    DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([action])
-  @@index([module])
-  @@index([createdAt])
-  @@map("audit_logs")
-}
-
-// ============================================
-// WISHLIST
-// ============================================
-
-model Wishlist {
-  id        String   @id @default(cuid())
-  userId    String
-  courseId  String
-  createdAt DateTime @default(now())
-
-  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@map("wishlists")
-}
-
-// ============================================
-// SITE SETTINGS
-// ============================================
-
-model SiteSettings {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Json?
-  group     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("site_settings")
-}
+-- ============================================
+-- 1. KIRKIRAR ENUMS (A Gudu ba tare da Error ba)
+-- ============================================
+DO $$ BEGIN CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'INSTRUCTOR', 'COURSE_MANAGER', 'STUDENT', 'GUEST'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "AccountStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'PENDING', 'DEACTIVATED'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "DifficultyLevel" AS ENUM ('BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "CourseStatus" AS ENUM ('DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED', 'SUSPENDED'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "VideoProvider" AS ENUM ('SUPABASE', 'AWS_S3', 'CLOUDFLARE_R2', 'CLOUDFLARE_STREAM', 'BUNNY_STREAM', 'VIMEO', 'YOUTUBE', 'GOOGLE_DRIVE', 'CUSTOM'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "StorageType" AS ENUM ('URL', 'FILE', 'STREAM'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "MaterialType" AS ENUM ('PDF', 'SLIDES', 'NOTE', 'ASSIGNMENT', 'ARTICLE', 'EBOOK', 'DATASET', 'CODE', 'EXTERNAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "Visibility" AS ENUM ('PUBLIC', 'ENROLLED', 'PREMIUM'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "CertificateStatus" AS ENUM ('ACTIVE', 'REVOKED', 'EXPIRED'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "SubscriptionStatus" AS ENUM ('ACTIVE', 'PAST_DUE', 'CANCELED', 'UNPAID', 'INCOMPLETE'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "PaymentProvider" AS ENUM ('STRIPE', 'PAYSTACK', 'FLUTTERWAVE', 'PAYPAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED', 'DISPUTED'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "NewsletterStatus" AS ENUM ('DRAFT', 'SCHEDULED', 'SENDING', 'SENT', 'FAILED'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "NewsletterAudience" AS ENUM ('ALL_USERS', 'STUDENTS', 'INSTRUCTORS', 'PREMIUM_MEMBERS', 'INACTIVE_USERS', 'SPECIFIC_COURSES'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "NotificationType" AS ENUM ('SYSTEM', 'ENROLLMENT', 'COURSE_UPDATE', 'CERTIFICATE', 'PAYMENT', 'NEWSLETTER', 'ANNOUNCEMENT', 'REMINDER'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+
+-- ============================================
+-- 2. KIRKIRAR TABLES (Daya bayan Daya)
+-- ============================================
+
+-- AUTH & USERS
+CREATE TABLE IF NOT EXISTS "users" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "email" TEXT NOT NULL UNIQUE,
+    "passwordHash" TEXT,
+    "emailVerified" TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "accounts" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "providerAccountId" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
+    UNIQUE("provider", "providerAccountId")
+);
+
+CREATE TABLE IF NOT EXISTS "sessions" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "sessionToken" TEXT NOT NULL UNIQUE,
+    "userId" TEXT NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "expires" TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "verification_tokens" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL UNIQUE,
+    "expires" TIMESTAMP WITH TIME ZONE NOT NULL,
+    UNIQUE("identifier", "token")
+);
+
+-- PROFILES & ROLES
+CREATE TABLE IF NOT EXISTS "profiles" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL UNIQUE REFERENCES "users"("id") ON DELETE CASCADE,
+    "fullName" TEXT,
+    "username" TEXT UNIQUE,
+    "phone" TEXT,
+    "country" TEXT,
+    "state" TEXT,
+    "city" TEXT,
+    "gender" TEXT,
+    "bio" TEXT,
+    "avatarUrl" TEXT,
+    "academicInterests" TEXT,
+    "socialLinks" JSONB,
+    "role" "UserRole" NOT NULL DEFAULT 'STUDENT',
+    "status" "AccountStatus" NOT NULL DEFAULT 'ACTIVE',
+    "lastLoginAt" TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "roles" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL UNIQUE,
+    "description" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "permissions" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "key" TEXT NOT NULL UNIQUE,
+    "description" TEXT,
+    "category" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Note: user_role_assignments doesn't handle the implicit many-to-many natively via Prisma's join tables, 
+-- but we create the main mapping table here.
+CREATE TABLE IF NOT EXISTS "user_role_assignments" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "roleId" TEXT NOT NULL REFERENCES "roles"("id") ON DELETE CASCADE,
+    "assignedBy" TEXT,
+    "expiresAt" TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "roleId")
+);
+
+-- COURSES
+CREATE TABLE IF NOT EXISTS "courses" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL UNIQUE,
+    "code" TEXT NOT NULL UNIQUE,
+    "category" TEXT,
+    "subcategory" TEXT,
+    "shortDescription" TEXT,
+    "fullDescription" TEXT,
+    "learningOutcomes" TEXT,
+    "prerequisites" TEXT,
+    "targetAudience" TEXT,
+    "difficultyLevel" "DifficultyLevel" NOT NULL DEFAULT 'BEGINNER',
+    "language" TEXT NOT NULL DEFAULT 'English',
+    "durationHours" INTEGER,
+    "thumbnailUrl" TEXT,
+    "promoVideoUrl" TEXT,
+    "price" DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    "currency" TEXT NOT NULL DEFAULT 'USD',
+    "isFree" BOOLEAN NOT NULL DEFAULT true,
+    "status" "CourseStatus" NOT NULL DEFAULT 'DRAFT',
+    "featured" BOOLEAN NOT NULL DEFAULT false,
+    "instructorId" TEXT REFERENCES "profiles"("id") ON DELETE SET NULL,
+    "metaTitle" TEXT,
+    "metaDescription" TEXT,
+    "tags" TEXT[],
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "publishedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "lessons" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "duration" INTEGER,
+    "isPreview" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "videos" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "lessonId" TEXT NOT NULL REFERENCES "lessons"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "videoUrl" TEXT NOT NULL,
+    "duration" INTEGER,
+    "thumbnailUrl" TEXT,
+    "provider" "VideoProvider" NOT NULL DEFAULT 'SUPABASE',
+    "storageType" "StorageType" NOT NULL DEFAULT 'URL',
+    "quality" TEXT,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "isPublic" BOOLEAN NOT NULL DEFAULT true,
+    "views" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "materials" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "lessonId" TEXT NOT NULL REFERENCES "lessons"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "type" "MaterialType" NOT NULL,
+    "fileUrl" TEXT NOT NULL,
+    "fileSize" INTEGER,
+    "mimeType" TEXT,
+    "visibility" "Visibility" NOT NULL DEFAULT 'PUBLIC',
+    "downloadAllowed" BOOLEAN NOT NULL DEFAULT true,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- LEARNING PATHS
+CREATE TABLE IF NOT EXISTS "learning_paths" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL UNIQUE,
+    "description" TEXT,
+    "thumbnailUrl" TEXT,
+    "difficulty" "DifficultyLevel" NOT NULL DEFAULT 'BEGINNER',
+    "estimatedHours" INTEGER,
+    "status" "CourseStatus" NOT NULL DEFAULT 'DRAFT',
+    "featured" BOOLEAN NOT NULL DEFAULT false,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "learning_path_courses" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "learningPathId" TEXT NOT NULL REFERENCES "learning_paths"("id") ON DELETE CASCADE,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "isRequired" BOOLEAN NOT NULL DEFAULT true,
+    UNIQUE("learningPathId", "courseId")
+);
+
+-- ENROLLMENTS & PROGRESS
+CREATE TABLE IF NOT EXISTS "enrollments" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "progressPercent" INTEGER NOT NULL DEFAULT 0,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP WITH TIME ZONE,
+    "enrolledAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "courseId")
+);
+
+CREATE TABLE IF NOT EXISTS "learning_path_enrollments" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE, -- Assuming userId refers to Profile here as well, based on Prisma
+    "learningPathId" TEXT NOT NULL REFERENCES "learning_paths"("id") ON DELETE CASCADE,
+    "progressPercent" INTEGER NOT NULL DEFAULT 0,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP WITH TIME ZONE,
+    "enrolledAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "learningPathId")
+);
+
+CREATE TABLE IF NOT EXISTS "learning_progress" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "lessonId" TEXT NOT NULL REFERENCES "lessons"("id") ON DELETE CASCADE,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "watchTime" INTEGER NOT NULL DEFAULT 0,
+    "lastPosition" INTEGER NOT NULL DEFAULT 0,
+    "completedAt" TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "courseId", "lessonId")
+);
+
+-- CERTIFICATES
+CREATE TABLE IF NOT EXISTS "certificates" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "certificateUrl" TEXT,
+    "templateUrl" TEXT,
+    "signatureUrl" TEXT,
+    "sealUrl" TEXT,
+    "verificationCode" TEXT NOT NULL UNIQUE,
+    "grade" TEXT,
+    "issuedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP WITH TIME ZONE,
+    "status" "CertificateStatus" NOT NULL DEFAULT 'ACTIVE',
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "courseId")
+);
+
+CREATE TABLE IF NOT EXISTS "certificate_templates" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "templateUrl" TEXT NOT NULL,
+    "signatureUrl" TEXT,
+    "sealUrl" TEXT,
+    "isDefault" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- PAYMENTS & SUBSCRIPTIONS
+CREATE TABLE IF NOT EXISTS "subscriptions" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "planName" TEXT NOT NULL,
+    "planInterval" TEXT NOT NULL DEFAULT 'month',
+    "price" DECIMAL(10, 2) NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'USD',
+    "status" "SubscriptionStatus" NOT NULL DEFAULT 'ACTIVE',
+    "provider" "PaymentProvider" NOT NULL DEFAULT 'STRIPE',
+    "providerId" TEXT UNIQUE,
+    "currentPeriodStart" TIMESTAMP WITH TIME ZONE,
+    "currentPeriodEnd" TIMESTAMP WITH TIME ZONE,
+    "cancelAtPeriodEnd" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "payments" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "courseId" TEXT REFERENCES "courses"("id") ON DELETE SET NULL,
+    "amount" DECIMAL(10, 2) NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'USD',
+    "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
+    "provider" "PaymentProvider" NOT NULL DEFAULT 'STRIPE',
+    "reference" TEXT UNIQUE,
+    "providerRef" TEXT,
+    "description" TEXT,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- NEWSLETTER
+CREATE TABLE IF NOT EXISTS "newsletters" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "status" "NewsletterStatus" NOT NULL DEFAULT 'DRAFT',
+    "scheduledAt" TIMESTAMP WITH TIME ZONE,
+    "sentAt" TIMESTAMP WITH TIME ZONE,
+    "audience" "NewsletterAudience" NOT NULL DEFAULT 'ALL_USERS',
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "newsletter_subscribers" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT UNIQUE REFERENCES "profiles"("id") ON DELETE SET NULL,
+    "email" TEXT NOT NULL UNIQUE,
+    "subscribed" BOOLEAN NOT NULL DEFAULT true,
+    "preferences" JSONB,
+    "subscribedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "unsubscribedAt" TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS "newsletter_logs" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "newsletterId" TEXT NOT NULL REFERENCES "newsletters"("id") ON DELETE CASCADE,
+    "subscriberId" TEXT,
+    "email" TEXT NOT NULL,
+    "opened" BOOLEAN NOT NULL DEFAULT false,
+    "clicked" BOOLEAN NOT NULL DEFAULT false,
+    "bounced" BOOLEAN NOT NULL DEFAULT false,
+    "unsubscribed" BOOLEAN NOT NULL DEFAULT false,
+    "openedAt" TIMESTAMP WITH TIME ZONE,
+    "clickedAt" TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- NOTIFICATIONS
+CREATE TABLE IF NOT EXISTS "notifications" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "type" "NotificationType" NOT NULL,
+    "link" TEXT,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- STORAGE
+CREATE TABLE IF NOT EXISTS "storage_files" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "bucket" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "fileUrl" TEXT NOT NULL,
+    "fileType" TEXT,
+    "mimeType" TEXT,
+    "size" BIGINT NOT NULL,
+    "uploadedBy" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ANALYTICS
+CREATE TABLE IF NOT EXISTS "analytics_events" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT,
+    "eventType" TEXT NOT NULL,
+    "eventName" TEXT NOT NULL,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- AUDIT LOGS
+CREATE TABLE IF NOT EXISTS "audit_logs" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT REFERENCES "users"("id") ON DELETE SET NULL,
+    "action" TEXT NOT NULL,
+    "module" TEXT NOT NULL,
+    "resourceType" TEXT,
+    "resourceId" TEXT,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
+    "status" TEXT,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- WISHLIST
+CREATE TABLE IF NOT EXISTS "wishlists" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL REFERENCES "profiles"("id") ON DELETE CASCADE,
+    "courseId" TEXT NOT NULL REFERENCES "courses"("id") ON DELETE CASCADE,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("userId", "courseId")
+);
+
+-- SITE SETTINGS
+CREATE TABLE IF NOT EXISTS "site_settings" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "key" TEXT NOT NULL UNIQUE,
+    "value" JSONB,
+    "group" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
