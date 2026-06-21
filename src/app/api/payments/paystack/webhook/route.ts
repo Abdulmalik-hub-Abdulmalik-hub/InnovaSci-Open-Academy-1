@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PaystackPayment } from "@/lib/payments/paystack";
+import { koboToNaira } from "@/lib/payments/paystack";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-
-// Lazy initialization
-let paystack: PaystackPayment | null = null;
-
-function getPaystackInstance(): PaystackPayment {
-  if (!paystack) {
-    paystack = new PaystackPayment({
-      secretKey: process.env.PAYSTACK_SECRET_KEY || "",
-      publicKey: process.env.PAYSTACK_PUBLIC_KEY || "",
-      webhookSecret: process.env.PAYSTACK_WEBHOOK_SECRET,
-    });
-  }
-  return paystack;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,7 +66,7 @@ async function handleSuccessfulPayment(data: any) {
     const { error: paymentError } = await supabase.from("payments").insert({
       user_id: userId,
       course_id: courseId,
-      amount: PaystackPayment.koboToNaira(data.amount),
+      amount: koboToNaira(data.amount),
       currency: data.currency || "NGN",
       status: "COMPLETED",
       provider: "PAYSTACK",
@@ -130,7 +116,7 @@ async function handleFailedPayment(data: any) {
     await supabase.from("payments").insert({
       user_id: userId,
       course_id: courseId,
-      amount: PaystackPayment.koboToNaira(data.amount),
+      amount: koboToNaira(data.amount),
       currency: data.currency || "NGN",
       status: "FAILED",
       provider: "PAYSTACK",

@@ -1,18 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PaystackPayment } from "@/lib/payments/paystack";
-
-// Lazy initialization
-let paystack: PaystackPayment | null = null;
-
-function getPaystackInstance(): PaystackPayment {
-  if (!paystack) {
-    paystack = new PaystackPayment({
-      secretKey: process.env.PAYSTACK_SECRET_KEY || "",
-      publicKey: process.env.PAYSTACK_PUBLIC_KEY || "",
-    });
-  }
-  return paystack;
-}
+import { verifyTransaction, koboToNaira } from "@/lib/payments/paystack";
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,12 +13,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const paystackInstance = getPaystackInstance();
-
     // Verify the transaction with Paystack
-    const response = await paystackInstance.verifyTransaction(reference);
+    const response = await verifyTransaction(reference);
 
-    if (response.status && response.data.status === "success") {
+    if (response.status && response.data && response.data.status === "success") {
       // Transaction verified successfully
       const transactionData = response.data;
       
@@ -40,7 +25,7 @@ export async function GET(request: NextRequest) {
         data: {
           verified: true,
           reference: transactionData.reference,
-          amount: PaystackPayment.koboToNaira(transactionData.amount),
+          amount: koboToNaira(transactionData.amount),
           currency: transactionData.currency,
           status: transactionData.status,
           customer: transactionData.customer,
