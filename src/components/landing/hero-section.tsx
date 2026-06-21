@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Sparkles, BookOpen, Users, Award } from "lucide-react";
+import { ArrowRight, Play, BookOpen, Users, Award, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -24,28 +25,34 @@ export function HeroSection() {
             transition={{ duration: 0.6 }}
             className="text-center lg:text-left"
           >
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-purple-500/10 text-brand-purple-600 dark:text-brand-purple-400 text-sm font-medium mb-6"
-            >
-              <Sparkles className="h-4 w-4" />
-              Powered by InnovaSci AI Labs
-            </motion.div>
-
-            {/* Title */}
+            {/* Title - Now at the top */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
             >
               <span className="gradient-text">InnovaSci</span>
               <br />
               <span className="text-foreground">Open Academy</span>
             </motion.h1>
+
+            {/* Badge - Now underneath the title */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-purple-500/10 text-brand-purple-600 dark:text-brand-purple-400 text-sm font-medium mb-6"
+            >
+              <Image
+                src="/icon.svg"
+                alt="InnovaSci AI Labs Logo"
+                width={20}
+                height={20}
+                className="h-5 w-5 object-contain"
+              />
+              <span>Powered by InnovaSci AI Labs</span>
+            </motion.div>
 
             {/* Mission Statement */}
             <motion.p
