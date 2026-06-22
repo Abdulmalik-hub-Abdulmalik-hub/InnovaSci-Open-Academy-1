@@ -37,14 +37,14 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    const { data, error } = await signIn(email, password);
+    const { error, user } = await signIn(email, password);
 
     if (error) {
       setError(error.message);
       setIsLoading(false);
-    } else if (data?.user) {
+    } else if (user) {
       // Fetch user role and redirect accordingly
-      const redirectPath = await getRedirectPath(data.user.id);
+      const redirectPath = await getRedirectPath(user.id);
       router.push(redirectPath);
     }
   };
