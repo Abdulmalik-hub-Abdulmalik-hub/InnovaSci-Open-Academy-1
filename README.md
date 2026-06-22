@@ -239,3 +239,5 @@ This is a private project. Please contact the repository owner for collaboration
 
 **Powered by InnovaSci AI Labs**
 *Democratizing high-quality scientific and technological education through open-access learning.*
+
+<!-- ci: trigger Vercel redeploy -->
