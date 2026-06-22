@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/components/providers/auth-provider";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,18 +21,31 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const getRedirectPath = async (userId: string): Promise<string> => {
+    const supabase = createClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    
+    return profile?.role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/dashboard';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    const { error } = await signIn(email, password);
+    const { data, error } = await signIn(email, password);
 
     if (error) {
       setError(error.message);
       setIsLoading(false);
-    } else {
-      router.push("/dashboard");
+    } else if (data?.user) {
+      // Fetch user role and redirect accordingly
+      const redirectPath = await getRedirectPath(data.user.id);
+      router.push(redirectPath);
     }
   };
 
