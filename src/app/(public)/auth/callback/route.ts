@@ -50,15 +50,23 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && session) {
+      // DEBUG: Log session info
+      console.log('[CALLBACK DEBUG] Session user ID:', session.user.id)
+      
       // Fetch user role and redirect accordingly
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', session.user.id)
         .single()
 
-      // Determine redirect based on role
-      const redirectPath = profile?.role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/dashboard'
+      // DEBUG: Log profile query result
+      console.log('[CALLBACK DEBUG] Profile query:', { profile, profileError })
+      console.log('[CALLBACK DEBUG] Profile role:', profile?.role)
+
+      // Determine redirect based on role - NOTE: Admin route is /admin, not /admin/dashboard
+      const redirectPath = profile?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'
+      console.log('[CALLBACK DEBUG] Redirecting to:', redirectPath)
       
       // Redirect to appropriate dashboard based on role
       return NextResponse.redirect(`${origin}${redirectPath}`)

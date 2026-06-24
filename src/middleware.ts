@@ -33,14 +33,19 @@ const getUserRole = async (supabase: ReturnType<typeof createServerClient>, user
       .eq('id', userId)
       .single()
     
+    // DEBUG: Log the profile query result
+    console.log('[MIDDLEWARE DEBUG] User ID:', userId)
+    console.log('[MIDDLEWARE DEBUG] Profile query result:', { profile, error })
+    console.log('[MIDDLEWARE DEBUG] Profile role:', profile?.role)
+    
     if (error || !profile) {
-      console.error('Error fetching profile:', error)
+      console.error('[MIDDLEWARE DEBUG] Error fetching profile:', error)
       return null
     }
     
     return profile.role
   } catch (err) {
-    console.error('Exception fetching profile:', err)
+    console.error('[MIDDLEWARE DEBUG] Exception fetching profile:', err)
     return null
   }
 }
@@ -95,13 +100,17 @@ export async function middleware(request: NextRequest) {
   if (isAdminRoute && isAuthenticated && userId) {
     const userRole = await getUserRole(supabase, userId)
     
+    // DEBUG: Log the admin route check
+    console.log('[MIDDLEWARE DEBUG] Admin route check:', { pathname, userRole, isAdminRoute, isAuthenticated })
+    
     // If user is NOT a SUPER_ADMIN, block access to all admin routes
     if (userRole !== 'SUPER_ADMIN') {
-      console.log(`Access denied to ${pathname} - User role: ${userRole}`)
+      console.log(`[MIDDLEWARE DEBUG] Access denied to ${pathname} - User role: ${userRole}`)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     
     // SUPER_ADMIN has full access to admin routes
+    console.log('[MIDDLEWARE DEBUG] SUPER_ADMIN access granted to:', pathname)
     return response
   }
 
