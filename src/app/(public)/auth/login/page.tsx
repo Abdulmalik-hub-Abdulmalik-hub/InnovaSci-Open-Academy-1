@@ -32,7 +32,7 @@ export default function LoginPage() {
       
       // If profile exists and user is SUPER_ADMIN, go to admin dashboard
       if (profile && profile.role === 'SUPER_ADMIN') {
-        return '/admin/dashboard';
+        return '/admin';
       }
       
       // Default to student dashboard

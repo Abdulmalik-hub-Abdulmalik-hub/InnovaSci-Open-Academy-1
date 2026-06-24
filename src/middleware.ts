@@ -115,7 +115,7 @@ export async function middleware(request: NextRequest) {
       const userRole = await getUserRole(supabase, userId)
       
       if (userRole === 'SUPER_ADMIN') {
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+        return NextResponse.redirect(new URL('/admin', request.url))
       }
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
@@ -131,7 +131,7 @@ export async function middleware(request: NextRequest) {
     const userRole = await getUserRole(supabase, userId)
     
     if (userRole === 'SUPER_ADMIN') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+      return NextResponse.redirect(new URL('/admin', request.url))
     }
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
