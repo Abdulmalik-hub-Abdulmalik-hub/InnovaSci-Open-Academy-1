@@ -22,14 +22,26 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const getRedirectPath = async (userId: string): Promise<string> => {
-    const supabase = createClient();
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-    
-    return profile?.role === 'SUPER_ADMIN' ? '/admin/dashboard' : '/dashboard';
+    try {
+      const supabase = createClient();
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      // If profile exists and user is SUPER_ADMIN, go to admin dashboard
+      if (profile && profile.role === 'SUPER_ADMIN') {
+        return '/admin/dashboard';
+      }
+      
+      // Default to student dashboard
+      return '/dashboard';
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+      // Fallback to student dashboard on error
+      return '/dashboard';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,6 +58,10 @@ export default function LoginPage() {
       // Fetch user role and redirect accordingly
       const redirectPath = await getRedirectPath(user.id);
       router.push(redirectPath);
+    } else {
+      // Handle unexpected case where signIn succeeds but no user returned
+      setError('Authentication failed. Please try again.');
+      setIsLoading(false);
     }
   };
 

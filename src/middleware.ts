@@ -5,8 +5,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 const protectedRoutes = ['/dashboard', '/admin']
 // Routes that are admin-only
 const adminRoutes = ['/admin']
-// Public routes that should redirect to dashboard if already logged in
-const publicRoutes = ['/auth/login', '/auth/register', '/']
+// Auth routes that should not be redirected (login page handles role-based redirect)
+const authRoutes = ['/auth/login', '/auth/register']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
   const isAuthenticated = !!session
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/auth/')
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
   const isRootRoute = pathname === '/'
 
   // If accessing protected route without auth, redirect to login
@@ -72,16 +72,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // If authenticated and accessing public/auth routes, redirect to appropriate dashboard
-  if (isAuthenticated && (isPublicRoute || isRootRoute)) {
-    // Fetch user role from profiles table
+  // If authenticated and accessing root route, redirect to appropriate dashboard
+  // Do NOT redirect from auth routes - let the login page handle role-based redirect
+  if (isAuthenticated && isRootRoute) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
       .single()
 
-    // Redirect SUPER_ADMIN to admin dashboard, others to student dashboard
     if (profile?.role === 'SUPER_ADMIN') {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url))
     } else {
