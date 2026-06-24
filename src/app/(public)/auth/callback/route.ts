@@ -4,10 +4,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const response = NextResponse.redirect(`${origin}${next}`)
+    const response = NextResponse.redirect(`${origin}/dashboard`)
     
     // Create Supabase client
     const supabase = createServerClient(
@@ -19,28 +18,12 @@ export async function GET(request: NextRequest) {
             return request.cookies.get(name)?.value
           },
           set(name: string, value: string, options: CookieOptions) {
-            request.cookies.set({
-              name,
-              value,
-              ...options,
-            })
-            response.cookies.set({
-              name,
-              value,
-              ...options,
-            })
+            request.cookies.set({ name, value, ...options })
+            response.cookies.set({ name, value, ...options })
           },
           remove(name: string, options: CookieOptions) {
-            request.cookies.set({
-              name,
-              value: '',
-              ...options,
-            })
-            response.cookies.set({
-              name,
-              value: '',
-              ...options,
-            })
+            request.cookies.set({ name, value: '', ...options })
+            response.cookies.set({ name, value: '', ...options })
           },
         },
       }
@@ -50,26 +33,22 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && session) {
-      // DEBUG: Log session info
-      console.log('[CALLBACK DEBUG] Session user ID:', session.user.id)
-      
-      // Fetch user role and redirect accordingly
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single()
+      try {
+        // Fetch user role and redirect accordingly
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
 
-      // DEBUG: Log profile query result
-      console.log('[CALLBACK DEBUG] Profile query:', { profile, profileError })
-      console.log('[CALLBACK DEBUG] Profile role:', profile?.role)
-
-      // Determine redirect based on role - NOTE: Admin route is /admin, not /admin/dashboard
-      const redirectPath = profile?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'
-      console.log('[CALLBACK DEBUG] Redirecting to:', redirectPath)
-      
-      // Redirect to appropriate dashboard based on role
-      return NextResponse.redirect(`${origin}${redirectPath}`)
+        // Determine redirect based on role - Admin route is /admin
+        const redirectPath = profile?.role === 'SUPER_ADMIN' ? '/admin' : '/dashboard'
+        return NextResponse.redirect(`${origin}${redirectPath}`)
+      } catch (err) {
+        // On error, redirect to dashboard as safe default
+        console.error('Callback profile query error:', err)
+        return NextResponse.redirect(`${origin}/dashboard`)
+      }
     }
   }
 

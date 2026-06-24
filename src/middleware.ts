@@ -25,7 +25,8 @@ const createSupabaseServerClient = (request: NextRequest, response: NextResponse
 }
 
 // Helper function to get user role from profiles table
-const getUserRole = async (supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string | null> => {
+// Returns 'STUDENT' as safe default if query fails
+const getUserRole = async (supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string> => {
   try {
     const { data: profile, error } = await supabase
       .from('profiles')
@@ -33,20 +34,15 @@ const getUserRole = async (supabase: ReturnType<typeof createServerClient>, user
       .eq('id', userId)
       .single()
     
-    // DEBUG: Log the profile query result
-    console.log('[MIDDLEWARE DEBUG] User ID:', userId)
-    console.log('[MIDDLEWARE DEBUG] Profile query result:', { profile, error })
-    console.log('[MIDDLEWARE DEBUG] Profile role:', profile?.role)
-    
-    if (error || !profile) {
-      console.error('[MIDDLEWARE DEBUG] Error fetching profile:', error)
-      return null
+    if (error) {
+      console.error('Profile query error:', error.message)
+      return 'STUDENT' // Safe default on error
     }
     
-    return profile.role
+    return profile?.role || 'STUDENT'
   } catch (err) {
-    console.error('[MIDDLEWARE DEBUG] Exception fetching profile:', err)
-    return null
+    console.error('Profile query exception:', err)
+    return 'STUDENT' // Safe default on exception
   }
 }
 
@@ -69,7 +65,7 @@ export async function middleware(request: NextRequest) {
   const isAuthenticated = !!session
   const userId = session?.user?.id || null
 
-  // Routes that are auth-related - we should NOT redirect from these
+  // Routes that are auth-related
   const isAuthRoute = pathname.startsWith('/auth/')
   
   // Routes that require authentication
@@ -78,9 +74,6 @@ export async function middleware(request: NextRequest) {
   // Admin-only routes
   const isAdminRoute = pathname.startsWith('/admin')
   
-  // Student dashboard route
-  const isStudentDashboard = pathname === '/dashboard'
-  
   // Root route
   const isRootRoute = pathname === '/'
 
@@ -88,7 +81,6 @@ export async function middleware(request: NextRequest) {
   // 1. AUTHENTICATION CHECK - Protect routes that need it
   // ============================================
   if (isProtectedRoute && !isAuthenticated) {
-    // Redirect to login, preserving the intended destination
     const loginUrl = new URL('/auth/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
@@ -100,27 +92,20 @@ export async function middleware(request: NextRequest) {
   if (isAdminRoute && isAuthenticated && userId) {
     const userRole = await getUserRole(supabase, userId)
     
-    // DEBUG: Log the admin route check
-    console.log('[MIDDLEWARE DEBUG] Admin route check:', { pathname, userRole, isAdminRoute, isAuthenticated })
-    
     // If user is NOT a SUPER_ADMIN, block access to all admin routes
     if (userRole !== 'SUPER_ADMIN') {
-      console.log(`[MIDDLEWARE DEBUG] Access denied to ${pathname} - User role: ${userRole}`)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     
     // SUPER_ADMIN has full access to admin routes
-    console.log('[MIDDLEWARE DEBUG] SUPER_ADMIN access granted to:', pathname)
     return response
   }
 
   // ============================================
-  // 3. AUTH ROUTES - Don't interfere with login/register flows
+  // 3. AUTH ROUTES - Handle authenticated users on auth pages
   // ============================================
-  if (isAuthRoute) {
-    // If already authenticated and trying to access login/register,
-    // redirect to appropriate dashboard
-    if (isAuthenticated && userId && (pathname === '/auth/login' || pathname === '/auth/register')) {
+  if (isAuthRoute && isAuthenticated && userId) {
+    if (pathname === '/auth/login' || pathname === '/auth/register') {
       const userRole = await getUserRole(supabase, userId)
       
       if (userRole === 'SUPER_ADMIN') {
@@ -128,13 +113,10 @@ export async function middleware(request: NextRequest) {
       }
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
-    
-    // Allow access to auth routes for non-authenticated users
-    return response
   }
 
   // ============================================
-  // 4. ROOT ROUTE - Redirect to appropriate dashboard
+  // 4. ROOT ROUTE - Redirect authenticated users to dashboard
   // ============================================
   if (isRootRoute && isAuthenticated && userId) {
     const userRole = await getUserRole(supabase, userId)
@@ -145,24 +127,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // ============================================
-  // 5. STUDENT DASHBOARD - Allow admins too (they can view student dashboard)
-  // ============================================
-  // This is handled by the page component itself - no middleware redirect needed
-
   return response
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     * - api routes (keep API routes accessible)
-     */
     '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
   ],
 }
