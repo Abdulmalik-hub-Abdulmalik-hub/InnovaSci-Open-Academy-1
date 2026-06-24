@@ -25,8 +25,7 @@ const createSupabaseServerClient = (request: NextRequest, response: NextResponse
 }
 
 // Helper function to get user role from profiles table
-// Returns 'STUDENT' as safe default if query fails
-const getUserRole = async (supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string> => {
+const getUserRole = async (supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string | null> => {
   try {
     const { data: profile, error } = await supabase
       .from('profiles')
@@ -35,14 +34,20 @@ const getUserRole = async (supabase: ReturnType<typeof createServerClient>, user
       .single()
     
     if (error) {
-      console.error('Profile query error:', error.message)
-      return 'STUDENT' // Safe default on error
+      console.error('Profile query error:', error.message, 'Code:', error.code)
+      return null
     }
     
-    return profile?.role || 'STUDENT'
+    if (!profile) {
+      console.error('Profile not found for user:', userId)
+      return null
+    }
+    
+    console.log('Role check - UserID:', userId, 'Role:', profile.role)
+    return profile.role
   } catch (err) {
     console.error('Profile query exception:', err)
-    return 'STUDENT' // Safe default on exception
+    return null
   }
 }
 
@@ -64,6 +69,8 @@ export async function middleware(request: NextRequest) {
   
   const isAuthenticated = !!session
   const userId = session?.user?.id || null
+
+  console.log('Middleware - Path:', pathname, 'Auth:', isAuthenticated, 'UserID:', userId)
 
   // Routes that are auth-related
   const isAuthRoute = pathname.startsWith('/auth/')
@@ -91,13 +98,16 @@ export async function middleware(request: NextRequest) {
   // ============================================
   if (isAdminRoute && isAuthenticated && userId) {
     const userRole = await getUserRole(supabase, userId)
+    console.log('Admin route check - Role:', userRole)
     
     // If user is NOT a SUPER_ADMIN, block access to all admin routes
     if (userRole !== 'SUPER_ADMIN') {
+      console.log('Redirecting to dashboard - userRole:', userRole)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     
     // SUPER_ADMIN has full access to admin routes
+    console.log('SUPER_ADMIN access granted')
     return response
   }
 
