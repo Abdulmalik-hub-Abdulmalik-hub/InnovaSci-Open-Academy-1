@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Helper function to create Supabase client
+// Helper function to create Supabase client (anon key - respects RLS)
 const createSupabaseServerClient = (request: NextRequest, response: NextResponse) => {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,27 +24,39 @@ const createSupabaseServerClient = (request: NextRequest, response: NextResponse
   )
 }
 
-// Helper function to get user role from profiles table
-const getUserRole = async (supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string | null> => {
+// Helper function to create Supabase admin client (service role - bypasses RLS)
+const createSupabaseAdminClient = () => {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        get() { return undefined },
+        set() {},
+        remove() {},
+      },
+    }
+  )
+}
+
+// Helper function to get user role from profiles table using admin client
+const getUserRole = async (userId: string): Promise<string | null> => {
   try {
-    const { data: profile, error } = await supabase
+    // Use service role key to bypass RLS
+    const supabaseAdmin = createSupabaseAdminClient()
+    
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .single()
     
     if (error) {
-      console.error('Profile query error:', error.message, 'Code:', error.code)
+      console.error('Profile query error:', error.message)
       return null
     }
     
-    if (!profile) {
-      console.error('Profile not found for user:', userId)
-      return null
-    }
-    
-    console.log('Role check - UserID:', userId, 'Role:', profile.role)
-    return profile.role
+    return profile?.role || null
   } catch (err) {
     console.error('Profile query exception:', err)
     return null
@@ -69,8 +81,6 @@ export async function middleware(request: NextRequest) {
   
   const isAuthenticated = !!session
   const userId = session?.user?.id || null
-
-  console.log('Middleware - Path:', pathname, 'Auth:', isAuthenticated, 'UserID:', userId)
 
   // Routes that are auth-related
   const isAuthRoute = pathname.startsWith('/auth/')
@@ -97,17 +107,14 @@ export async function middleware(request: NextRequest) {
   // 2. ADMIN ROUTE PROTECTION - Only SUPER_ADMIN allowed
   // ============================================
   if (isAdminRoute && isAuthenticated && userId) {
-    const userRole = await getUserRole(supabase, userId)
-    console.log('Admin route check - Role:', userRole)
+    const userRole = await getUserRole(userId)
     
     // If user is NOT a SUPER_ADMIN, block access to all admin routes
     if (userRole !== 'SUPER_ADMIN') {
-      console.log('Redirecting to dashboard - userRole:', userRole)
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     
     // SUPER_ADMIN has full access to admin routes
-    console.log('SUPER_ADMIN access granted')
     return response
   }
 
@@ -116,7 +123,7 @@ export async function middleware(request: NextRequest) {
   // ============================================
   if (isAuthRoute && isAuthenticated && userId) {
     if (pathname === '/auth/login' || pathname === '/auth/register') {
-      const userRole = await getUserRole(supabase, userId)
+      const userRole = await getUserRole(userId)
       
       if (userRole === 'SUPER_ADMIN') {
         return NextResponse.redirect(new URL('/admin', request.url))
@@ -129,7 +136,7 @@ export async function middleware(request: NextRequest) {
   // 4. ROOT ROUTE - Redirect authenticated users to dashboard
   // ============================================
   if (isRootRoute && isAuthenticated && userId) {
-    const userRole = await getUserRole(supabase, userId)
+    const userRole = await getUserRole(userId)
     
     if (userRole === 'SUPER_ADMIN') {
       return NextResponse.redirect(new URL('/admin', request.url))
