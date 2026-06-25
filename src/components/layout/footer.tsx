@@ -43,12 +43,10 @@ export function Footer() {
             <div className="flex flex-col gap-4 mb-4">
               {/* Full Brand Logo - Vertical */}
               <Link href="/" className="flex items-center gap-2">
-                <Image
+                <img
                   src="/assets/images/brand-logo-vertical.svg"
                   alt="InnovaSci Open Academy"
-                  width={180}
-                  height={100}
-                  className="h-24 w-auto"
+                  className="h-28 w-auto"
                 />
               </Link>
             </div>

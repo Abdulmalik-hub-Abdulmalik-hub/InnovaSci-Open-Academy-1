@@ -1,35 +1,53 @@
-<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="100" viewBox="0 0 400 100" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <defs>
     <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#7C3AED"/>
       <stop offset="100%" stop-color="#2563EB"/>
     </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
   </defs>
   
-  <!-- Icon Container -->
-  <rect x="10" y="15" width="50" height="50" rx="10" fill="url(#iconGradient)"/>
-  
-  <!-- Academy Icon - Layered Books/Learning Symbol -->
-  <path d="M35 23L20 30L35 37L50 30L35 23Z" fill="white" fill-opacity="0.95"/>
-  <path d="M20 37L35 44L50 37" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M20 33L35 40L50 33" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <!-- Logo Container - Main Icon -->
+  <g transform="translate(0, 0)">
+    <!-- Background shape -->
+    <rect x="0" y="15" width="70" height="70" rx="14" fill="url(#iconGradient)"/>
+    
+    <!-- Academy Symbol - Layered books/shield -->
+    <path d="M35 28L15 43V72L35 87L55 72V43L35 28Z" fill="white" fill-opacity="0.15"/>
+    <path d="M35 28L15 43L35 58L55 43L35 28Z" fill="white" fill-opacity="0.3"/>
+    <path d="M35 40L23 49V66L35 75L47 66V49L35 40Z" fill="white" fill-opacity="0.5"/>
+    
+    <!-- Inner book symbol -->
+    <path d="M35 50L27 56V68L35 74L43 68V56L35 50Z" fill="white"/>
+    
+    <!-- Book pages detail -->
+    <path d="M35 50V74" stroke="url(#iconGradient)" stroke-width="1"/>
+    <path d="M29 58L35 62L41 58" stroke="url(#iconGradient)" stroke-width="1" fill="none"/>
+    
+    <!-- Graduation cap element at top -->
+    <path d="M35 25L23 34L35 30L47 34L35 25Z" fill="white"/>
+  </g>
   
   <!-- Text Container -->
-  <text x="75" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280">
+  <text x="90" y="38" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" fill="#6B7280" font-weight="400">
     Powered by
   </text>
   
   <!-- InnovaSci AI Labs -->
-  <text x="75" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#7C3AED">
+  <text x="90" y="58" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="20" fill="#7C3AED" font-weight="700" letter-spacing="-0.3">
     InnovaSci AI Labs
   </text>
   
   <!-- Line separator -->
-  <line x1="75" y1="58" x2="290" y2="58" stroke="#E5E7EB" stroke-width="1"/>
+  <line x1="90" y1="68" x2="390" y2="68" stroke="#E5E7EB" stroke-width="1"/>
   
   <!-- InnovaSci Open Academy -->
-  <text x="75" y="74" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1F2937">
+  <text x="90" y="82" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" fill="#1F2937" font-weight="600" letter-spacing="0.3">
     InnovaSci Open Academy
   </text>
 </svg>

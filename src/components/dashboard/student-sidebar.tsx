@@ -54,12 +54,10 @@ export function StudentSidebar() {
       {/* Logo */}
       <div className="p-4 border-b">
         <Link href="/" className="flex items-center gap-2">
-          <Image
+          <img
             src="/assets/images/brand-logo-vertical.svg"
             alt="InnovaSci Open Academy"
-            width={120}
-            height={60}
-            className="h-14 w-auto"
+            className="h-16 w-auto"
           />
         </Link>
       </div>

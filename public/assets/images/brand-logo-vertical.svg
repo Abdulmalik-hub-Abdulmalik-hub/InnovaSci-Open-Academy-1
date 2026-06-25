@@ -1,42 +1,59 @@
-<svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background with gradient -->
+<svg width="300" height="450" viewBox="0 0 300 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F8F7FF"/>
-      <stop offset="100%" stop-color="#EEF2FF"/>
-    </linearGradient>
     <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#7C3AED"/>
       <stop offset="100%" stop-color="#2563EB"/>
     </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
   </defs>
   
-  <!-- Card Background -->
-  <rect x="10" y="10" width="180" height="100" rx="16" fill="url(#bgGradient)" stroke="#E5E7EB" stroke-width="1"/>
-  
-  <!-- Icon Container -->
-  <rect x="70" y="18" width="60" height="40" rx="8" fill="url(#iconGradient)"/>
-  
-  <!-- Academy Icon - Layered Books/Learning Symbol -->
-  <path d="M100 26L85 33L100 40L115 33L100 26Z" fill="white" fill-opacity="0.95"/>
-  <path d="M85 40L100 47L115 40" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M85 36L100 43L115 36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <!-- Logo Container - Main Icon -->
+  <g transform="translate(75, 20)">
+    <!-- Background shape -->
+    <rect x="0" y="0" width="150" height="150" rx="24" fill="url(#iconGradient)"/>
+    
+    <!-- Academy Symbol - Layered books/shield -->
+    <path d="M75 25L35 55V115L75 145L115 115V55L75 25Z" fill="white" fill-opacity="0.15"/>
+    <path d="M75 25L35 55L75 85L115 55L75 25Z" fill="white" fill-opacity="0.3"/>
+    <path d="M75 45L50 60V95L75 110L100 95V60L75 45Z" fill="white" fill-opacity="0.5"/>
+    
+    <!-- Inner book symbol -->
+    <path d="M75 60L55 72V98L75 110L95 98V72L75 60Z" fill="white"/>
+    
+    <!-- Book pages detail -->
+    <path d="M75 60V110" stroke="url(#iconGradient)" stroke-width="2"/>
+    <path d="M60 75L75 82L90 75" stroke="url(#iconGradient)" stroke-width="1.5" fill="none"/>
+    <path d="M60 88L75 95L90 88" stroke="url(#iconGradient)" stroke-width="1.5" fill="none"/>
+    
+    <!-- Graduation cap element at top -->
+    <path d="M75 20L55 35L75 28L95 35L75 20Z" fill="white"/>
+  </g>
   
   <!-- Powered by text -->
-  <text x="100" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">
+  <text x="150" y="205" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="14" fill="#6B7280" text-anchor="middle" font-weight="400">
     Powered by
   </text>
   
-  <!-- InnovaSci AI Labs text -->
-  <text x="100" y="84" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#7C3AED" text-anchor="middle">
+  <!-- InnovaSci AI Labs - Main brand name -->
+  <text x="150" y="235" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="22" fill="#7C3AED" text-anchor="middle" font-weight="700" letter-spacing="-0.5">
     InnovaSci AI Labs
   </text>
   
-  <!-- Separator line -->
-  <line x1="60" y1="92" x2="140" y2="92" stroke="#E5E7EB" stroke-width="1"/>
+  <!-- Decorative line -->
+  <rect x="75" y="255" width="150" height="3" rx="1.5" fill="url(#accentGradient)"/>
   
   <!-- InnovaSci Open Academy -->
-  <text x="100" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">
+  <text x="150" y="295" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" fill="#1F2937" text-anchor="middle" font-weight="600" letter-spacing="0.5">
     InnovaSci Open Academy
+  </text>
+  
+  <!-- Tagline -->
+  <text x="150" y="325" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11" fill="#9CA3AF" text-anchor="middle" font-weight="400">
+    Democratizing Scientific Education
   </text>
 </svg>

@@ -75,12 +75,10 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <Image
+            <img
               src="/assets/images/brand-logo-horizontal.svg"
               alt="InnovaSci Open Academy"
-              width={220}
-              height={50}
-              className="h-10 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
 

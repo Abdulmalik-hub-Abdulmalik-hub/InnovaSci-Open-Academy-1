@@ -44,12 +44,10 @@ export function HeroSection() {
               transition={{ delay: 0.2 }}
               className="inline-flex items-center mb-6"
             >
-              <Image
+              <img
                 src="/assets/images/brand-logo-horizontal.svg"
                 alt="Powered by InnovaSci AI Labs"
-                width={280}
-                height={70}
-                className="h-auto w-auto object-contain"
+                className="h-16 w-auto"
               />
             </motion.div>
 
