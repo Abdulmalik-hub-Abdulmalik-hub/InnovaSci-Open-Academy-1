@@ -76,10 +76,14 @@ export function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <img
-              src="/assets/images/brand-logo-horizontal.svg"
+              src="/assets/images/academy-icon.svg"
               alt="InnovaSci Open Academy"
-              className="h-12 w-auto"
+              className="h-10 w-10"
             />
+            <div className="flex flex-col">
+              <span className="text-base font-bold gradient-text leading-tight">InnovaSci</span>
+              <span className="text-xs text-muted-foreground leading-tight">Open Academy</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

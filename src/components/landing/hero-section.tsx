@@ -30,25 +30,24 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4"
             >
               <span className="gradient-text">InnovaSci</span>
               <br />
               <span className="text-foreground">Open Academy</span>
             </motion.h1>
 
-            {/* Badge - Now underneath the title */}
+            {/* Powered by - Text only below title */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center mb-6"
+              className="inline-flex items-center gap-2 mb-8"
             >
-              <img
-                src="/assets/images/brand-logo-horizontal.svg"
-                alt="Powered by InnovaSci AI Labs"
-                className="h-16 w-auto"
-              />
+              <span className="text-sm text-muted-foreground">Powered by</span>
+              <span className="text-sm font-semibold text-brand-purple-600 dark:text-brand-purple-400">
+                InnovaSci AI Labs
+              </span>
             </motion.div>
 
             {/* Mission Statement */}
