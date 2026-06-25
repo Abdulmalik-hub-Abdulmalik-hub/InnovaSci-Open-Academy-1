@@ -57,7 +57,10 @@ export default function RegisterPage() {
         setSuccess(true);
       } else if (data.user && data.session) {
         // User created with immediate session (email confirmation disabled)
-        router.push('/dashboard');
+        // Wait for session to be set, then redirect to callback for role check
+        setTimeout(() => {
+          window.location.href = '/auth/callback';
+        }, 1000);
         return;
       }
     } catch (err: any) {

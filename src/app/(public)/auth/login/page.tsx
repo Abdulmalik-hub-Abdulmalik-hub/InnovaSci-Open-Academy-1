@@ -25,14 +25,22 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    const { error } = await signIn(email, password);
+    try {
+      const { error } = await signIn(email, password);
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setIsLoading(false);
+        return;
+      }
+
+      // Wait a moment for session to be set, then redirect to callback
+      setTimeout(() => {
+        window.location.href = '/auth/callback';
+      }, 1000);
+    } catch (err) {
+      setError('An unexpected error occurred');
       setIsLoading(false);
-    } else {
-      // Redirect to callback which will check role and redirect to correct dashboard
-      window.location.href = '/auth/callback';
     }
   };
 
