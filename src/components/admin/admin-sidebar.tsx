@@ -63,16 +63,12 @@ export function AdminSidebar() {
       <div className="p-4 border-b">
         <Link href="/admin" className="flex items-center gap-2">
           <Image
-            src="/assets/images/academy-icon.svg"
+            src="/assets/images/brand-logo-vertical.svg"
             alt="InnovaSci Open Academy"
-            width={40}
-            height={40}
-            className="h-10 w-10"
+            width={120}
+            height={60}
+            className="h-14 w-auto"
           />
-          <div>
-            <span className="font-bold gradient-text">Admin</span>
-            <span className="text-xs text-muted-foreground block">Dashboard</span>
-          </div>
         </Link>
       </div>
 

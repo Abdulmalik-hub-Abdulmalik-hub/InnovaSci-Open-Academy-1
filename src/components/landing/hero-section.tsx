@@ -42,14 +42,14 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-brand-purple-500/10 text-brand-purple-600 dark:text-brand-purple-400 text-sm font-medium mb-6"
+              className="inline-flex items-center mb-6"
             >
               <Image
-                src="/assets/images/innovasci-ai-labs-logo.svg"
-                alt="InnovaSci AI Labs Logo"
-                width={100}
-                height={20}
-                className="h-5 w-auto object-contain"
+                src="/assets/images/brand-logo-horizontal.svg"
+                alt="Powered by InnovaSci AI Labs"
+                width={280}
+                height={70}
+                className="h-auto w-auto object-contain"
               />
             </motion.div>
 

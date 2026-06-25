@@ -1,0 +1,35 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon Container -->
+  <rect x="10" y="15" width="50" height="50" rx="10" fill="url(#iconGradient)"/>
+  
+  <!-- Academy Icon - Layered Books/Learning Symbol -->
+  <path d="M35 23L20 30L35 37L50 30L35 23Z" fill="white" fill-opacity="0.95"/>
+  <path d="M20 37L35 44L50 37" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 33L35 40L50 33" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Text Container -->
+  <text x="75" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280">
+    Powered by
+  </text>
+  
+  <!-- InnovaSci AI Labs -->
+  <text x="75" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#7C3AED">
+    InnovaSci AI Labs
+  </text>
+  
+  <!-- Line separator -->
+  <line x1="75" y1="58" x2="290" y2="58" stroke="#E5E7EB" stroke-width="1"/>
+  
+  <!-- InnovaSci Open Academy -->
+  <text x="75" y="74" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1F2937">
+    InnovaSci Open Academy
+  </text>
+</svg>

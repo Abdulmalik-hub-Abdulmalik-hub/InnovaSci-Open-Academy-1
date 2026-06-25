@@ -41,27 +41,16 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex flex-col gap-4 mb-4">
-              {/* Academy Logo */}
+              {/* Full Brand Logo - Vertical */}
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/assets/images/academy-logo.svg"
+                  src="/assets/images/brand-logo-vertical.svg"
                   alt="InnovaSci Open Academy"
                   width={180}
-                  height={50}
-                  className="h-12 w-auto"
+                  height={100}
+                  className="h-24 w-auto"
                 />
               </Link>
-              {/* Powered by InnovaSci AI Labs */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">Powered by</span>
-                <Image
-                  src="/assets/images/innovasci-ai-labs-logo.svg"
-                  alt="InnovaSci AI Labs"
-                  width={100}
-                  height={30}
-                  className="h-6 w-auto"
-                />
-              </div>
             </div>
             <p className="text-sm text-muted-foreground mb-4 max-w-sm">
               Empowering a global community of innovators, researchers, and learners 

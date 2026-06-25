@@ -1,0 +1,42 @@
+<svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F7FF"/>
+      <stop offset="100%" stop-color="#EEF2FF"/>
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Card Background -->
+  <rect x="10" y="10" width="180" height="100" rx="16" fill="url(#bgGradient)" stroke="#E5E7EB" stroke-width="1"/>
+  
+  <!-- Icon Container -->
+  <rect x="70" y="18" width="60" height="40" rx="8" fill="url(#iconGradient)"/>
+  
+  <!-- Academy Icon - Layered Books/Learning Symbol -->
+  <path d="M100 26L85 33L100 40L115 33L100 26Z" fill="white" fill-opacity="0.95"/>
+  <path d="M85 40L100 47L115 40" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M85 36L100 43L115 36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Powered by text -->
+  <text x="100" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">
+    Powered by
+  </text>
+  
+  <!-- InnovaSci AI Labs text -->
+  <text x="100" y="84" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#7C3AED" text-anchor="middle">
+    InnovaSci AI Labs
+  </text>
+  
+  <!-- Separator line -->
+  <line x1="60" y1="92" x2="140" y2="92" stroke="#E5E7EB" stroke-width="1"/>
+  
+  <!-- InnovaSci Open Academy -->
+  <text x="100" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#1F2937" text-anchor="middle">
+    InnovaSci Open Academy
+  </text>
+</svg>

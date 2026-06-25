@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -74,31 +75,13 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative h-10 w-10">
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-purple-600 to-brand-blue-600" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg
-                  className="h-6 w-6 text-white"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
-            </div>
-            <div className="hidden sm:block">
-              <span className="text-lg font-bold gradient-text">
-                InnovaSci
-              </span>
-              <span className="text-lg font-medium text-muted-foreground">
-                {" "}
-                Open Academy
-              </span>
-            </div>
+            <Image
+              src="/assets/images/brand-logo-horizontal.svg"
+              alt="InnovaSci Open Academy"
+              width={220}
+              height={50}
+              className="h-10 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
