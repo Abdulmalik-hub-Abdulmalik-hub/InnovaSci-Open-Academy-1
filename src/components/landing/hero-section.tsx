@@ -37,15 +37,20 @@ export function HeroSection() {
               <span className="text-foreground">Open Academy</span>
             </motion.h1>
 
-            {/* Powered by - Text only below title */}
+            {/* Powered by - With icon */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="inline-flex items-center gap-2 mb-8"
             >
-              <span className="text-sm text-muted-foreground">Powered by</span>
-              <span className="text-sm font-semibold text-brand-purple-600 dark:text-brand-purple-400">
+              <span className="text-xs text-muted-foreground">Powered by</span>
+              <img
+                src="/assets/images/innovasci-ai-labs-icon.png"
+                alt="InnovaSci AI Labs"
+                className="h-4 w-auto"
+              />
+              <span className="text-xs font-semibold text-brand-purple-600 dark:text-brand-purple-400">
                 InnovaSci AI Labs
               </span>
             </motion.div>
