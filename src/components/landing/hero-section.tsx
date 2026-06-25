@@ -25,32 +25,36 @@ export function HeroSection() {
             transition={{ duration: 0.6 }}
             className="text-center lg:text-left"
           >
-            {/* Title - Now at the top */}
+            {/* Title - Bold & Gradient */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4"
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4"
             >
-              <span className="gradient-text">InnovaSci</span>
+              <span className="bg-gradient-to-r from-brand-purple-600 via-brand-blue-600 to-brand-teal-600 bg-clip-text text-transparent">
+                InnovaSci
+              </span>
               <br />
-              <span className="text-foreground">Open Academy</span>
+              <span className="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent">
+                Open Academy
+              </span>
             </motion.h1>
 
-            {/* Powered by - With icon */}
+            {/* Powered by - Bold & Professional */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="inline-flex items-center gap-2 mb-8"
             >
-              <span className="text-xs text-muted-foreground">Powered by</span>
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Powered by</span>
               <img
                 src="/assets/images/innovasci-ai-labs-icon.png"
                 alt="InnovaSci AI Labs"
-                className="h-4 w-auto"
+                className="h-5 w-auto brightness-110"
               />
-              <span className="text-xs font-semibold text-brand-purple-600 dark:text-brand-purple-400">
+              <span className="text-sm font-bold bg-gradient-to-r from-brand-purple-600 via-brand-blue-600 to-brand-teal-600 bg-clip-text text-transparent">
                 InnovaSci AI Labs
               </span>
             </motion.div>

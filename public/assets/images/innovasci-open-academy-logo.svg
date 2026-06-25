@@ -1,0 +1,61 @@
+<svg width="300" height="100" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Light Gradient Background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F5F3FF"/>
+    </linearGradient>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Background -->
+  <rect x="0" y="10" width="90" height="80" rx="16" fill="url(#bgGradient)" stroke="#E9D5FF" stroke-width="1"/>
+  
+  <!-- Icon Container with Gradient -->
+  <rect x="5" y="15" width="80" height="70" rx="14" fill="url(#primaryGradient)"/>
+  
+  <!-- Academy Symbol - Layered Design -->
+  <!-- Outer Shield -->
+  <path d="M45 22L22 38V62L45 78L68 62V38L45 22Z" fill="white" fill-opacity="0.15"/>
+  
+  <!-- Middle Layer -->
+  <path d="M45 22L22 38L45 54L68 38L45 22Z" fill="white" fill-opacity="0.25"/>
+  
+  <!-- Inner Book -->
+  <path d="M45 30L30 40V58L45 68L60 58V40L45 30Z" fill="white" fill-opacity="0.4"/>
+  
+  <!-- Book Spine -->
+  <path d="M45 30V68" stroke="#7C3AED" stroke-width="1.5" stroke-opacity="0.3"/>
+  
+  <!-- Graduation Cap at Top -->
+  <path d="M45 20L30 30L45 26L60 30L45 20Z" fill="white"/>
+  
+  <!-- Text: InnovaSci -->
+  <text x="100" y="45" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="800" fill="#1F2937" letter-spacing="-0.5">
+    InnovaSci
+  </text>
+  
+  <!-- Text: Open Academy -->
+  <text x="100" y="72" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="18" font-weight="600" fill="url(#textGradient)" letter-spacing="0.3">
+    Open Academy
+  </text>
+  
+  <!-- Decorative Line Under Text -->
+  <rect x="100" y="78" width="180" height="3" rx="1.5" fill="url(#primaryGradient)" opacity="0.7"/>
+</svg>

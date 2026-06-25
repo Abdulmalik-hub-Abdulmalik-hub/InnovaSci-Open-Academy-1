@@ -76,7 +76,7 @@ export function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <img
-              src="/assets/images/innovasci-open-academy-logo.png"
+              src="/assets/images/innovasci-open-academy-logo.svg"
               alt="InnovaSci Open Academy"
               className="h-10 w-auto"
             />
