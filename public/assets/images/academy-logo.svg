@@ -1,0 +1,27 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Academy Logo Icon -->
+  <rect x="5" y="10" width="40" height="40" rx="8" fill="url(#academyGradient)"/>
+  <path d="M25 18L12 25L25 32L38 25L25 18Z" fill="white"/>
+  <path d="M12 32L25 39L38 32" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 28L25 35L38 28" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text -->
+  <text x="55" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#111827">
+    InnovaSci
+  </text>
+  <text x="55" y="44" font-family="Arial, sans-serif" font-size="12" font-weight="500" fill="#6B7280">
+    Open Academy
+  </text>
+  
+  <!-- Powered by badge -->
+  <rect x="155" y="15" width="40" height="30" rx="4" fill="#F3F4F6"/>
+  <text x="175" y="25" font-family="Arial, sans-serif" font-size="6" fill="#6B7280" text-anchor="middle">Powered by</text>
+  <text x="175" y="38" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#7C3AED" text-anchor="middle">InnovaSci</text>
+  
+  <defs>
+    <linearGradient id="academyGradient" x1="5" y1="10" x2="45" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+</svg>

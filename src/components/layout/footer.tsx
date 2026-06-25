@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, Github, Twitter, Linkedin, Youtube, Mail } from "lucide-react";
 
 const footerLinks = {
@@ -6,15 +7,15 @@ const footerLinks = {
     { name: "About", href: "/about" },
     { name: "Courses", href: "/courses" },
     { name: "Learning Paths", href: "/learning-paths" },
+    { name: "Membership", href: "/membership" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Blog", href: "/blog" },
   ],
   resources: [
-    { name: "Help Center", href: "/help-center" },
+    { name: "Forum", href: "/forum" },
+    { name: "Contact", href: "/contact" },
     { name: "Documentation", href: "/docs" },
     { name: "Community", href: "/community" },
     { name: "Partners", href: "/partners" },
-    { name: "Careers", href: "/careers" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
@@ -39,31 +40,29 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="relative h-10 w-10">
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-purple-600 to-brand-blue-600" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg
-                    className="h-6 w-6 text-white"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                    <path d="M2 17l10 5 10-5" />
-                    <path d="M2 12l10 5 10-5" />
-                  </svg>
-                </div>
+            <div className="flex flex-col gap-4 mb-4">
+              {/* Academy Logo */}
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/assets/images/academy-logo.svg"
+                  alt="InnovaSci Open Academy"
+                  width={180}
+                  height={50}
+                  className="h-12 w-auto"
+                />
+              </Link>
+              {/* Powered by InnovaSci AI Labs */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Powered by</span>
+                <Image
+                  src="/assets/images/innovasci-ai-labs-logo.svg"
+                  alt="InnovaSci AI Labs"
+                  width={100}
+                  height={30}
+                  className="h-6 w-auto"
+                />
               </div>
-              <div>
-                <span className="text-lg font-bold">InnovaSci</span>
-                <span className="text-lg font-medium text-muted-foreground">
-                  {" "}
-                  Open Academy
-                </span>
-              </div>
-            </Link>
+            </div>
             <p className="text-sm text-muted-foreground mb-4 max-w-sm">
               Empowering a global community of innovators, researchers, and learners 
               with the skills and knowledge needed to solve complex real-world challenges.

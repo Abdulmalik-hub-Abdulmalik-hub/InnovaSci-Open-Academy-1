@@ -40,9 +40,9 @@ const navigationItems = [
   { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Learning Paths", href: "/learning-paths", icon: BookOpen },
   { name: "About", href: "/about", icon: Info },
+  { name: "Membership", href: "/membership", icon: User },
+  { name: "Forum", href: "/forum", icon: HelpCircle },
   { name: "Contact", href: "/contact", icon: Mail },
-  { name: "Blog", href: "/blog", icon: BookOpen },
-  { name: "Help Center", href: "/help-center", icon: HelpCircle },
   { name: "Pricing", href: "/pricing", icon: DollarSign },
 ];
 

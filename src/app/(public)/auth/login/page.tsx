@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/components/providers/auth-provider";
-import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,47 +20,19 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const getRedirectPath = async (userId: string): Promise<string> => {
-    try {
-      const supabase = createClient();
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-      
-      // If profile exists and user is SUPER_ADMIN, go to admin dashboard
-      if (profile && profile.role === 'SUPER_ADMIN') {
-        return '/admin';
-      }
-      
-      // Default to student dashboard
-      return '/dashboard';
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      // Fallback to student dashboard on error
-      return '/dashboard';
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    const { error, user } = await signIn(email, password);
+    const { error } = await signIn(email, password);
 
     if (error) {
       setError(error.message);
       setIsLoading(false);
-    } else if (user) {
-      // Fetch user role and redirect accordingly
-      const redirectPath = await getRedirectPath(user.id);
-      router.push(redirectPath);
     } else {
-      // Handle unexpected case where signIn succeeds but no user returned
-      setError('Authentication failed. Please try again.');
-      setIsLoading(false);
+      // Redirect to dashboard - middleware will handle role-based redirect
+      router.push('/dashboard');
     }
   };
 

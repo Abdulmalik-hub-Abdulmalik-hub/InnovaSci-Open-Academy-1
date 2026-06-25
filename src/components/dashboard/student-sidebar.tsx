@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -48,31 +49,23 @@ export function StudentSidebar() {
       .slice(0, 2);
   };
 
-  return (
     <aside className="sticky top-0 h-screen w-64 bg-card border-r flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b">
         <Link href="/" className="flex items-center gap-2">
-          <div className="relative h-10 w-10">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-purple-600 to-brand-blue-600" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg
-                className="h-6 w-6 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-          </div>
+          <Image
+            src="/assets/images/academy-icon.svg"
+            alt="InnovaSci Open Academy"
+            width={40}
+            height={40}
+            className="h-10 w-10"
+          />
           <div>
             <span className="font-bold gradient-text">InnovaSci</span>
             <span className="text-xs text-muted-foreground block">Student Portal</span>
           </div>
+        </Link>
+      </div>
         </Link>
       </div>
 
