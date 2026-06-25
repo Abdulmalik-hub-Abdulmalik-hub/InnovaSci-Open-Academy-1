@@ -117,34 +117,6 @@ export function HeroSection() {
                 </Link>
               </Button>
             </motion.div>
-
-            {/* Demo Admin Access */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="mt-8 p-4 bg-gradient-to-r from-brand-purple-600/10 via-brand-blue-600/10 to-brand-teal-600/10 border border-brand-purple-200 dark:border-brand-purple-800 rounded-lg max-w-md"
-            >
-              <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-gradient-to-br from-brand-purple-600 to-brand-blue-600 flex items-center justify-center">
-                  <span className="text-white text-[8px] font-bold">DEMO</span>
-                </span>
-                Admin Portal Demo Access
-              </p>
-              <p className="text-sm mb-3">
-                <span className="font-medium">Email:</span>{" "}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">admin@innovasci.com</code>
-              </p>
-              <p className="text-sm mb-3">
-                <span className="font-medium">Password:</span>{" "}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">Admin@123</code>
-              </p>
-              <Button size="sm" asChild className="w-full bg-gradient-to-r from-brand-purple-600 to-brand-blue-600 hover:opacity-90">
-                <Link href="/auth/login">
-                  Login as Admin
-                </Link>
-              </Button>
-            </motion.div>
           </motion.div>
 
           {/* Right Content - Visual */}

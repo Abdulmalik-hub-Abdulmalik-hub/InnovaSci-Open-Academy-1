@@ -83,38 +83,6 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Demo Credentials Section */}
-            <div className="bg-gradient-to-r from-brand-purple-600/10 via-brand-blue-600/10 to-brand-teal-600/10 border border-brand-purple-200 dark:border-brand-purple-800 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-purple-600 to-brand-blue-600 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">DEMO</span>
-                </div>
-                <span className="font-semibold text-sm">Demo Admin Account</span>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Email:</span>
-                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono">admin@innovasci.com</code>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Password:</span>
-                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono">Admin@123</code>
-                </div>
-              </div>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                className="w-full mt-3 bg-gradient-to-r from-brand-purple-600 to-brand-blue-600 text-white hover:opacity-90"
-                onClick={() => {
-                  setEmail('admin@innovasci.com');
-                  setPassword('Admin@123');
-                }}
-              >
-                Use Demo Credentials
-              </Button>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
