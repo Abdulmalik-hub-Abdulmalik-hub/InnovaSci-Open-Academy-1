@@ -31,13 +31,14 @@ export default function LoginPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
-      // Redirect to dashboard - middleware will handle role-based redirect
-      router.push('/dashboard');
+      // Redirect to callback which will check role and redirect to correct dashboard
+      window.location.href = '/auth/callback';
     }
   };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    // Google OAuth will redirect to /auth/callback which handles role-based redirect
     await signInWithGoogle();
   };
 
