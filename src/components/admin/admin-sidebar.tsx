@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -73,7 +74,6 @@ export function AdminSidebar() {
             <span className="text-xs text-muted-foreground block">Dashboard</span>
           </div>
         </Link>
-      </div>
       </div>
 
       {/* Navigation */}

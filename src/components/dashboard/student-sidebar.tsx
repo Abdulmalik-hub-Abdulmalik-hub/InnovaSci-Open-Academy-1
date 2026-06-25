@@ -49,6 +49,7 @@ export function StudentSidebar() {
       .slice(0, 2);
   };
 
+  return (
     <aside className="sticky top-0 h-screen w-64 bg-card border-r flex flex-col">
       {/* Logo */}
       <div className="p-4 border-b">
@@ -64,8 +65,6 @@ export function StudentSidebar() {
             <span className="font-bold gradient-text">InnovaSci</span>
             <span className="text-xs text-muted-foreground block">Student Portal</span>
           </div>
-        </Link>
-      </div>
         </Link>
       </div>
 
